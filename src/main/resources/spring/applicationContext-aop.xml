@@ -8,7 +8,7 @@
 
     <!--aop配置-->
     <aop:config>
-        <aop:pointcut id="items_pointCut" expression="execution(* com.mybatis.service.impl.*.*(..))"/>
-        <aop:advisor advice-ref="txAdvice" pointcut-ref="items_pointCut"/>
+        <aop:pointcut id="items_pointcut_aop" expression="execution(* com.mybatis.service.impl.*.*(..))"/>
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="items_pointcut_aop"/>
     </aop:config>
 </beans>
