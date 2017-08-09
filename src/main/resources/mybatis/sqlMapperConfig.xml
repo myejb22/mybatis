@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <typeAliases>
+        <typeAlias type="com.mybatis.User" alias="user"/>
+        <package name="com.mybatis.po"/>
+        <package name="com.mybatis.vo"/>
+    </typeAliases>
+
+    <mappers>
+        <mapper resource="sqlMap/User.xml"/>
+        <!--<mapper resource="mapper/UserMapper.xml"/>
+        <mapper class="com.mybatis.mapper.UserMapper"/>-->
+        <package name="com.mybatis.mapper"/>
+    </mappers>
+
+</configuration>

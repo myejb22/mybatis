@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mybatis.mapper.OrderMappers">
+
+    <!--订单与用户的对应关系，一对一映射的配置文件-->
+    <resultMap id="OrdersAndUserResultMap" type="com.mybatis.po.Orders">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="number" property="number"/>
+        <result column="createtime" property="createtime"/>
+        <result column="note" property="note"/>
+        <association property="user" javaType="com.mybatis.User">
+            <id column="user_id" property="id"/>
+            <result column="username" property="username"/>
+            <result column="sex" property="sex"/>
+            <result column="address" property="address"/>
+        </association>
+    </resultMap>
+
+    <!--订单与订单明细的对应关系-->
+    <resultMap id="OrdersAndOrderDetailResultMap" type="com.mybatis.po.Orders" extends="OrdersAndUserResultMap">
+        <collection property="orderdetails" ofType="com.mybatis.po.Orderdetail">
+            <id column="orderdetail_id" property="id"/>
+            <result column="items_id" property="itemsId"/>
+            <result column="items_num" property="itemsNum"/>
+            <result column="orders_id" property="ordersId"/>
+        </collection>
+    </resultMap>
+    <select id="findOrdersJoinUserById" parameterType="int" resultMap="OrdersAndUserResultMap">
+        SELECT ord.*,u.username,u.sex,u.address FROM orders ord
+        JOIN `user` u ON ord.user_id = u.id
+        WHERE ord.id=#{id}
+    </select>
+
+    <select id="findOrdersById" parameterType="int" resultType="com.mybatis.po.Orders" useCache="true">
+        SELECT * FROM orders
+        WHERE id=#{id}
+    </select>
+
+    <select id="findOrdersList" resultMap="OrdersAndOrderDetailResultMap">
+        SELECT ord.*,
+          u.username,u.sex,u.address,
+          rd.id orderdetail_id,rd.orders_id,rd.items_id,rd.items_num
+        FROM orders ord
+        JOIN `user` u ON ord.user_id = u.id
+        JOIN `orderdetail` rd ON rd.orders_id = ord.id
+    </select>
+
+    <resultMap id="UserAndItemsByResultMap" type="com.mybatis.User">
+        <id property="id" column="user_id"/>
+        <result property="username" column="username"/>
+        <result property="sex" column="sex"/>
+        <result property="birthday" column="birthday"/>
+        <result property="address" column="address"/>
+        <collection property="ordersList" ofType="com.mybatis.po.Orders">
+            <id property="id" column="id"/>
+            <result property="userId" column="user_id"/>
+            <result property="number" column="number"/>
+            <result property="createtime" column="createtime"/>
+            <result property="note" column="note"/>
+            <collection property="orderdetails" ofType="com.mybatis.po.Orderdetail">
+                <id property="id" column="orderdetail_id"/>
+                <result property="ordersId" column="orders_id"/>
+                <result property="itemsId" column="items_id"/>
+                <result property="itemsNum" column="items_num"/>
+                <association property="items" javaType="com.mybatis.po.Items">
+                    <id property="id" column="item_id"/>
+                    <result property="name" column="name"/>
+                    <result property="price" column="price"/>
+                    <result property="pic" column="pic"/>
+                    <result property="createtime" column="createtime"/>
+                    <result property="detail" column="detail"/>
+                </association>
+            </collection>
+        </collection>
+    </resultMap>
+
+    <!-- 查询用户与商品的对应关系-->
+    <select id="findUserAndItemsByResultMap" resultMap="UserAndItemsByResultMap">
+        SELECT
+            ord.*,
+            u.username,u.birthday,u.sex,u.address,
+            detail.id orderdetail_id,detail.items_id,detail.items_num,
+            ite.id item_id,ite.`name`,ite.pic,ite.price,ite.createtime,ite.detail
+        FROM orders ord
+        JOIN `user` u ON ord.user_id = u.id
+        JOIN orderdetail detail ON detail.orders_id = ord.id
+        JOIN items ite ON detail.items_id = ite.id
+    </select>
+
+    <!--关于延迟加载的配置-->
+    <resultMap id="OrdersUserLazyLoading" type="com.mybatis.po.Orders">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="number" property="number"/>
+        <result column="createtime" property="createtime"/>
+        <result column="note" property="note"/>
+        <association property="user" javaType="com.mybatis.User" select="com.mybatis.mapper.UserMapper.findUserById" column="user_id"/>
+    </resultMap>
+    <select id="findOrdersUserLazyLoading" resultMap="OrdersUserLazyLoading">
+        SELECT * FROM orders
+    </select>
+</mapper>
