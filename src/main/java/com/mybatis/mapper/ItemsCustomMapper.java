@@ -13,6 +13,5 @@ import java.util.List;
  */
 public interface ItemsCustomMapper {
 
-    List<ItemsCustom> findItemsList(ItemsQueryVo queryVo) throws Exception
-            ;
+    List<ItemsCustom> findItemsList(ItemsQueryVo queryVo) throws Exception;
 }
